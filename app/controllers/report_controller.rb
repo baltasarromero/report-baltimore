@@ -9,7 +9,7 @@ class ReportController < ApplicationController
     @year = params[:year] || Time.current.year.to_s
     @previous_year = (@year.to_i - 1).to_s
     @next_year = (@year.to_i + 1).to_s
-    hide_project = CustomField.find_by(name: 'Ocultar en Facturacion')
+    @hide_project = CustomField.find_by(name: 'Ocultar en Facturacion')
     @hidden = {}
     @total_hours = calculate_total_hours(projects, @hidden)
   end
