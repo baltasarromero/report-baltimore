@@ -65,6 +65,6 @@ class ReportController < ApplicationController
     # Get the id of the custom field needed
     hide_project_id = CustomField.find_by(name: 'Ocultar en Facturacion')
     # A value of 0 indicates that the project is NOT hidden for invoiving reports
-    Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_id} and cv.value = 0 order by projects.id");
+    Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_id} and cv.value = 0");
   end
 end
