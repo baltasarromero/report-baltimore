@@ -9,8 +9,8 @@ class ReportController < ApplicationController
     @year = params[:year] || Time.current.year.to_s
     @previous_year = (@year.to_i - 1).to_s
     @next_year = (@year.to_i + 1).to_s
-    @total_hours = calculate_total_hours(projects)
     @hidden = fetch_hidden_projects(projects)
+    @total_hours = calculate_total_hours(projects)
   end
 
   private
@@ -39,12 +39,14 @@ class ReportController < ApplicationController
     non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
   
     projects.each do |proj|
-      month_hours = {}
-      (1..12).each do |month|
-        monthly_hours = get_total_monthly_hours(proj.id, month, @year, non_billables_id)
-        month_hours[month] = monthly_hours if monthly_hours > 0
-      end
-      total_hours[proj.id] = month_hours
+      if !@hidden.include?(proj.id)
+        month_hours = {}
+        (1..12).each do |month|
+          monthly_hours = get_total_monthly_hours(proj.id, month, @year, non_billables_id)
+          month_hours[month] = monthly_hours if monthly_hours > 0
+        end
+        total_hours[proj.id] = month_hours
+      end  
     end
   
     total_hours
