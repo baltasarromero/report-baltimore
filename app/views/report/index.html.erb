@@ -14,10 +14,10 @@
 <% @billing_types.each do |billing_type| %>
   <% projects = @grouped_projects[billing_type] %>
 
-  <% if !projects.nil? && projects.any? && projects.any? { |p| !@hidden[p.id] } %>
+  <% if !projects.nil? && projects.any? %>
     <% is_closed = !billing_type.nil? && billing_type.downcase.include?("cerrado") %>
     <% is_staff = !billing_type.nil? && billing_type.downcase.include?("staff") %>
-    <% billing_type_id = (billing_type.presence || "Sin tipo de facturaci      n").gsub(/[^a-zA-Z0-9]/, '').downcase %>
+    <% billing_type_id = (billing_type.presence || "Sin tipo de facturación").gsub(/[^a-zA-Z0-9]/, '').downcase %>
 
       <div id="<%= billing_type_id %>">
       <h3><%= billing_type.presence || "Sin tipo de facturaci      n" %></h3>
@@ -42,19 +42,17 @@
         </thead>
         <tbody>
           <% projects.sort_by { |p| p.name }.each do |proj| %>
-            <% unless @hidden[proj.id] %>
-              <tr>
-                <td style="width: 200px; border: 1px solid;"><%= link_to proj.name, project_path(proj) %></td>
-                <% [*1..12].each do |m| %>
-                  <td style="width: 80px; text-align: center; border: 1px solid;">
-                    <% if proj.module_enabled?(:proformanext) %>
-                      <%= link_to @total_hours[proj.id][m], controller: "proformanext", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
-                    <% else %>
-                      <%= link_to @total_hours[proj.id][m], controller: "proforma", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
-                    <% end %>
-                  </td>
-                <% end %>
-              </tr>
+            <tr>
+              <td style="width: 200px; border: 1px solid;"><%= link_to proj.name, project_path(proj) %></td>
+              <% [*1..12].each do |m| %>
+                <td style="width: 80px; text-align: center; border: 1px solid;">
+                  <% if proj.module_enabled?(:proformanext) %>
+                    <%= link_to @total_hours[proj.id][m], controller: "proformanext", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
+                  <% else %>
+                    <%= link_to @total_hours[proj.id][m], controller: "proforma", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
+                  <% end %>
+                </td>
+            </tr>
             <% end %>
           <% end %>
         </tbody>
