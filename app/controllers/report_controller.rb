@@ -27,7 +27,9 @@ class ReportController < ApplicationController
       @total_hours[proj.id] = month_hours
       @hidden[proj.id] = proj.custom_field_value(hide_project.id).to_i.nonzero?
     end
-  end private
+  end 
+  
+  private
 
   def project_time_entries(project_id, month, year)
     time_entries = TimeEntry.where("tmonth = ? and tyear = ? and project_id = ?",
