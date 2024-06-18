@@ -1,6 +1,8 @@
 name: deploy-to-dev
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 jobs:
   build:
     name: Deploy Report to redmine test
