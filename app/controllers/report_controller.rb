@@ -41,7 +41,7 @@ class ReportController < ApplicationController
   
     projects.each do |proj|
       # Mark project as hidden if it should be hidden from invoicing
-      logger.info("project data #{p proj}" 
+      logger.info("project data #{p proj}") 
       hidden[proj.id] = proj.custom_field_value(@hide_project.id).to_i.nonzero?
 
       month_hours = {}
