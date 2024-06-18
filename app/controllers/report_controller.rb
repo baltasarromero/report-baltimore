@@ -11,7 +11,7 @@ class ReportController < ApplicationController
     @next_year = (@year.to_i + 1).to_s
     hide_project = CustomField.find_by(name: 'Ocultar en Facturacion')
     @hidden = {}
-    @total_hours = calculate_total_hours(projects)
+    @total_hours = calculate_total_hours(projects, @hidden)
   end
 
   private
@@ -35,7 +35,7 @@ class ReportController < ApplicationController
     projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
   end
 
-  def calculate_total_hours(projects)
+  def calculate_total_hours(projects, hidden)
     total_hours = {}
     non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
   
