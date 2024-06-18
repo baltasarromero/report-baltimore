@@ -52,8 +52,8 @@
                     <%= link_to @total_hours[proj.id][m], controller: "proforma", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
                   <% end %>
                 </td>
+              <% end %>  
             </tr>
-            <% end %>
           <% end %>
         </tbody>
       </table>
