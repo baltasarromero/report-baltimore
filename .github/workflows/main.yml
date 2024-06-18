@@ -16,7 +16,7 @@ jobs:
         port: ${{ secrets.PORT }}
         source: "./*"
         target: "/tmp/report"
-    - name: Cleaning plugins/proformanext directory
+    - name: Cleaning plugins/report directory
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
@@ -24,7 +24,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.PORT }}
         script: sudo docker exec redmine-folderit-test rm -rf /home/redmine/redmine/plugins/report
-    - name: Copy Proformanext files to container
+    - name: Copy Report files to container
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }} 
