@@ -9,7 +9,8 @@ class ReportController < ApplicationController
     @year = params[:year] || Time.current.year.to_s
     @previous_year = (@year.to_i - 1).to_s
     @next_year = (@year.to_i + 1).to_s
-    @hidden = fetch_hidden_projects(projects)
+    hide_project = CustomField.find_by(name: 'Ocultar en Facturacion')
+    @hidden = {}
     @total_hours = calculate_total_hours(projects)
   end
 
@@ -39,9 +40,8 @@ class ReportController < ApplicationController
     non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
   
     projects.each do |proj|
-      if @hidden[proj.id]
-        logger.info("Project with id #{proj.id} is hidden")  
-      end
+      # Mark project as hidden if it should be hidden from invoicing
+      hidden[proj.id] = proj.custom_field_value(hide_project.id).to_i.nonzero?
 
       month_hours = {}
       (1..12).each do |month|
@@ -52,18 +52,6 @@ class ReportController < ApplicationController
     end
   
     total_hours
-  end
-
-  def fetch_hidden_projects(projects)
-    hide_project = CustomField.find_by(name: 'Ocultar en Facturacion')
-    return {} unless hide_project
-  
-    hidden = {}
-    projects.each do |proj|
-      hidden[proj.id] = proj.custom_field_value(hide_project.id).to_i.nonzero?
-    end
-  
-    hidden
   end
 
   def project_time_entries(project_id, month, year, non_billables_id)
