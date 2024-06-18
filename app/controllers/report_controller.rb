@@ -41,8 +41,8 @@ class ReportController < ApplicationController
     projects.each do |proj|
       month_hours = {}
       (1..12).each do |month|
-        monthly_hours = get_total_monthly_hours(proj.id, month, @year)
-        month_hours[month] = monthly_hours
+        monthly_hours = get_total_monthly_hours(proj.id, month, @year, non_billables_id)
+        month_hours[month] = monthly_hours if monthly_hours > 0
       end
       total_hours[proj.id] = month_hours
     end
@@ -62,13 +62,13 @@ class ReportController < ApplicationController
     hidden
   end
 
-  def project_time_entries(project_id, month, year)
+  def project_time_entries(project_id, month, year, non_billables_id)
     time_entries = TimeEntry.where("tmonth = ? and tyear = ? and project_id = ?",
-                                   month, year, project_id).where.not("activity_id = ?", @non_billables_id)
+                                   month, year, project_id).where.not("activity_id = ?", non_billables_id)
   end
 
-  def get_total_monthly_hours(project_id, month, year)
-    time_entries = project_time_entries(project_id, month, year)
+  def get_total_monthly_hours(project_id, month, year, non_billables_id)
+    time_entries = project_time_entries(project_id, month, year, non_billables_id)
 
     time_entries.sum(:hours).to_i
   end
