@@ -40,7 +40,7 @@ class ReportController < ApplicationController
   
     projects.each do |proj|
       if @hidden[proj.id]
-        logger.info("Project with id " + proj.id + " is hidden")  
+        logger.info("Project with id #{proj.id} is hidden")  
       end
 
       month_hours = {}
