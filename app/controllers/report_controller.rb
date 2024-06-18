@@ -39,14 +39,16 @@ class ReportController < ApplicationController
     non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
   
     projects.each do |proj|
-      if !@hidden.include?(proj.id)
-        month_hours = {}
-        (1..12).each do |month|
-          monthly_hours = get_total_monthly_hours(proj.id, month, @year, non_billables_id)
-          month_hours[month] = monthly_hours if monthly_hours > 0
-        end
-        total_hours[proj.id] = month_hours
-      end  
+      if @hidden[proj.id]
+        logger.info("Project with id " + proj.id + " is hidden")  
+      end
+
+      month_hours = {}
+      (1..12).each do |month|
+        monthly_hours = get_total_monthly_hours(proj.id, month, @year, non_billables_id)
+        month_hours[month] = monthly_hours if monthly_hours > 0
+      end
+      total_hours[proj.id] = month_hours  
     end
   
     total_hours
