@@ -7,46 +7,48 @@ jobs:
   build:
     name: Deploy Report to redmine test
     runs-on: ubuntu-latest
+    environment: 
+      name: dev
     steps:
     - uses: actions/checkout@master
     - name: Copy files to tmp directory on host
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets.DEV_HOST }}
-        username: ${{ secrets.DEV_USERNAME }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        port: ${{ secrets.DEV_PORT }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
         source: "./*"
         target: "/tmp/report"
     - name: Cleaning plugins/report directory
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_HOST }}
-        username: ${{ secrets.DEV_USERNAME }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        port: ${{ secrets.DEV_PORT }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
         script: sudo docker exec redmine-folderit-test rm -rf /home/redmine/redmine/plugins/report
     - name: Copy Report files to container
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_HOST }} 
-        username: ${{ secrets.DEV_USERNAME }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        port: ${{ secrets.DEV_PORT }}
+        host: ${{ secrets.HOST }} 
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
         script: sudo docker cp /tmp/report redmine-folderit-test:/home/redmine/redmine/plugins/
     - name: Install updated plugins
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_HOST }}
-        username: ${{ secrets.DEV_USERNAME }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        port: ${{ secrets.DEV_PORT }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
         script: sudo docker exec redmine-folderit-test redmine-install-plugins    
     - name: Final cleanup
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_HOST }}
-        username: ${{ secrets.DEV_USERNAME }}
-        key: ${{ secrets.DEV_SSH_KEY }}
-        port: ${{ secrets.DEV_PORT }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
         script: rm -rf /tmp/report
