@@ -23,7 +23,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.PORT }}
-        script: docker exec redmine-folderit-test rm -rf /home/redmine/redmine/plugins/report
+        script: sudo docker exec redmine-folderit-test rm -rf /home/redmine/redmine/plugins/report
     - name: Copy Proformanext files to container
       uses: appleboy/ssh-action@master
       with:
@@ -31,7 +31,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.PORT }}
-        script: docker cp /tmp/report redmine-folderit-test:/home/redmine/redmine/plugins/
+        script: sudo docker cp /tmp/report redmine-folderit-test:/home/redmine/redmine/plugins/
     - name: Install updated plugins
       uses: appleboy/ssh-action@master
       with:
@@ -39,7 +39,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.PORT }}
-        script: docker exec redmine-folderit-test redmine-install-plugins    
+        script: sudo docker exec redmine-folderit-test redmine-install-plugins    
     - name: Final cleanup
       uses: appleboy/ssh-action@master
       with:
