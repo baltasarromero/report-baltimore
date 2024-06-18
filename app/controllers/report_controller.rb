@@ -20,9 +20,7 @@ class ReportController < ApplicationController
     projects.each do |proj|
       month_hours = Hash.new
       [*1..12].each do |month|
-        if has_hours?(proj.id, month, @year)
-          month_hours[month] = total_hours(proj.id, month, @year)
-        end
+        month_hours[month] = total_hours(proj.id, month, @year)
       end
       @total_hours[proj.id] = month_hours
       @hidden[proj.id] = proj.custom_field_value(hide_project.id).to_i.nonzero?
