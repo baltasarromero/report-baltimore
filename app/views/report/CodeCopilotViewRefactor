@@ -1,0 +1,73 @@
+<% projects_to_display = projects.reject { |p| @hidden[p.id] }.sort_by(&:name) %>
+<% projects_to_display.each_slice(10) do |project_batch| %>
+  <div class="project-batch">
+    <table class="project-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <% (1..12).each do |month| %>
+            <th><%= Date::MONTHNAMES[month] %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% project_batch.each do |proj| %>
+          <tr>
+            <td><%= link_to proj.name, project_path(proj) %></td>
+            <% (1..12).each do |month| %>
+              <td class="centered">
+                <%= link_to (is_staff ? @total_hours[proj.id][month] : "Ver"), controller: "proforma", project_id: proj.identifier, month: "#{@year}-#{month.to_s.rjust(2, '0')}-01" if @project_hours[proj.id][month] %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<!-- CSS Styles -->
+<style>
+  .project-table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    word-break: break-word;
+    width: 100%;
+  }
+  .project-table th, .project-table td {
+    border: 1px solid;
+    padding: 8px;
+  }
+  .project-table th {
+    width: 80px;
+  }
+  .project-table td.centered {
+    text-align: center;
+  }
+</style>
+
+
+
+
+
+
+
+The index.html.erb file contains HTML and embedded Ruby (ERB) code, and it appears to be quite large. Performance issues in an HTML.erb file could arise from several factors, including inefficient Ruby code, large datasets, excessive DOM manipulation, and redundant or blocking resources.
+
+Identified Potential Issues and Proposed Solutions
+Large Datasets and Loop Inefficiencies:
+
+If projects contains a large dataset, the performance might suffer due to iterating over all elements.
+Solution: Implement pagination or lazy loading to handle large datasets more efficiently.
+Complex Conditional Logic:
+
+The use of nested conditionals can slow down rendering.
+Solution: Simplify the conditional logic or refactor into helper methods to reduce complexity in the view.
+Rendering Inefficiencies:
+
+Repeatedly calling link_to and other helper methods inside loops can be inefficient.
+Solution: Cache frequently accessed data or precompute values where possible.
+Inline Styles:
+
+Inline styles can slow down the rendering process, and it's better to use CSS classes.
+Solution: Move inline styles to a CSS stylesheet.

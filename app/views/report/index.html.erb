@@ -1,0 +1,79 @@
+<% content_for :header_tags do %>
+  <%= javascript_include_tag "report.js", :plugin => "report" %>
+<% end %>
+
+<% html_title "Facturación " + @year %>
+
+<%= link_to ("<button style='vertical-align: middle;'><</button>").html_safe, controller: "report", year: @previous_year %>
+<h2 style="display: inline; padding: 2px 5px 2px 5px; vertical-align: middle;"><%= @year %></h2>
+<%= link_to ("<button style='vertical-align: middle;'>></button>").html_safe, controller: "report", year: @next_year %>
+<br/><br/>
+
+<div id="filters">
+  <input type="checkbox" id="show-closed">Mostrar cerrados
+  <br/>
+  <% @billing_types.each do |billing_type| %>
+    <% projects = @grouped_projects[billing_type] %>
+
+    <% if !projects.nil? && projects.any? && projects.any? { |p| !@hidden[p.id] } %>
+      <% is_closed = !billing_type.nil? && billing_type.downcase.include?("cerrado") %>
+      <% billing_type_id = (billing_type.presence || "Sin tipo de facturación").gsub(/[^a-zA-Z0-9]/, '').downcase %>
+
+      <input type="checkbox" id="toogle-<%= billing_type_id %>" <%= is_closed ? "" : "checked" %>><%= billing_type.presence || "Sin tipo de facturación" %>
+    <% end %>
+  <% end %>
+</div>
+<br/>
+
+<% @billing_types.each do |billing_type| %>
+  <% projects = @grouped_projects[billing_type] %>
+
+  <% if !projects.nil? && projects.any? && projects.any? { |p| !@hidden[p.id] } %>
+    <% is_closed = !billing_type.nil? && billing_type.downcase.include?("cerrado") %>
+    <% is_staff = !billing_type.nil? && billing_type.downcase.include?("staff") %>
+    <% billing_type_id = (billing_type.presence || "Sin tipo de facturación").gsub(/[^a-zA-Z0-9]/, '').downcase %>
+
+    <% if is_closed %>
+      <div id="<%= billing_type_id %>" class="closed" style="display: none;">
+    <% else %>
+      <div id="<%= billing_type_id %>">
+    <% end %>
+      <h3><%= billing_type.presence || "Sin tipo de facturación" %></h3>
+
+      <table style="border-collapse: collapse; table-layout: fixed; word-break: break-word;">
+        <thead>
+          <tr>
+            <th style="width: 200px; border: 1px solid;">Nombre</th>
+            <th style="width: 80px; border: 1px solid;">Enero</th>
+            <th style="width: 80px; border: 1px solid;">Febrero</th>
+            <th style="width: 80px; border: 1px solid;">Marzo</th>
+            <th style="width: 80px; border: 1px solid;">Abril</th>
+            <th style="width: 80px; border: 1px solid;">Mayo</th>
+            <th style="width: 80px; border: 1px solid;">Junio</th>
+            <th style="width: 80px; border: 1px solid;">Julio</th>
+            <th style="width: 80px; border: 1px solid;">Agosto</th>
+            <th style="width: 80px; border: 1px solid;">Septiembre</th>
+            <th style="width: 80px; border: 1px solid;">Octubre</th>
+            <th style="width: 80px; border: 1px solid;">Noviembre</th>
+            <th style="width: 80px; border: 1px solid;">Diciembre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% projects.sort_by { |p| p.name }.each do |proj| %>
+            <% unless @hidden[proj.id] %>
+              <tr>
+                <td style="width: 200px; border: 1px solid;"><%= link_to proj.name, project_path(proj) %></td>
+                <% [*1..12].each do |m| %>
+                  <td style="width: 80px; text-align: center; border: 1px solid;">
+                    <%= link_to is_staff ? @total_hours[proj.id][m] : "Ver", controller: "proforma", project_id: proj.identifier, month: @year + "-" + m.to_s.rjust(2, "0") + "-01" if @project_hours[proj.id][m] %>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+      <br/>
+    </div>
+  <% end %>
+<% end %>
