@@ -42,7 +42,7 @@ class ReportController < ApplicationController
       month_hours = {}
       (1..12).each do |month|
         monthly_hours = get_total_monthly_hours(proj.id, month, @year)
-        month_hours[month] = monthly_hours if monthly_hours > 0
+        month_hours[month] = monthly_hours
       end
       total_hours[proj.id] = month_hours
     end
