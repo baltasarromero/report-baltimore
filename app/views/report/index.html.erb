@@ -2,27 +2,13 @@
   <%= javascript_include_tag "report.js", :plugin => "report" %>
 <% end %>
 
-<% html_title "Facturación " + @year %>
+<% html_title "Facturaci      n " + @yer.to_s %>
 
 <%= link_to ("<button style='vertical-align: middle;'><</button>").html_safe, controller: "report", year: @previous_year %>
-<h2 style="display: inline; padding: 2px 5px 2px 5px; vertical-align: middle;"><%= @year %></h2>
+<h2 style="display: inline; padding: 2px 5px 2px 5px; vertical-align: middle;"><%= @year.to_s %></h2>
 <%= link_to ("<button style='vertical-align: middle;'>></button>").html_safe, controller: "report", year: @next_year %>
 <br/><br/>
 
-<div id="filters">
-  <input type="checkbox" id="show-closed">Mostrar cerrados
-  <br/>
-  <% @billing_types.each do |billing_type| %>
-    <% projects = @grouped_projects[billing_type] %>
-
-    <% if !projects.nil? && projects.any? && projects.any? { |p| !@hidden[p.id] } %>
-      <% is_closed = !billing_type.nil? && billing_type.downcase.include?("cerrado") %>
-      <% billing_type_id = (billing_type.presence || "Sin tipo de facturación").gsub(/[^a-zA-Z0-9]/, '').downcase %>
-
-      <input type="checkbox" id="toogle-<%= billing_type_id %>" <%= is_closed ? "" : "checked" %>><%= billing_type.presence || "Sin tipo de facturación" %>
-    <% end %>
-  <% end %>
-</div>
 <br/>
 
 <% @billing_types.each do |billing_type| %>
@@ -31,14 +17,10 @@
   <% if !projects.nil? && projects.any? && projects.any? { |p| !@hidden[p.id] } %>
     <% is_closed = !billing_type.nil? && billing_type.downcase.include?("cerrado") %>
     <% is_staff = !billing_type.nil? && billing_type.downcase.include?("staff") %>
-    <% billing_type_id = (billing_type.presence || "Sin tipo de facturación").gsub(/[^a-zA-Z0-9]/, '').downcase %>
+    <% billing_type_id = (billing_type.presence || "Sin tipo de facturaci      n").gsub(/[^a-zA-Z0-9]/, '').downcase %>
 
-    <% if is_closed %>
-      <div id="<%= billing_type_id %>" class="closed" style="display: none;">
-    <% else %>
       <div id="<%= billing_type_id %>">
-    <% end %>
-      <h3><%= billing_type.presence || "Sin tipo de facturación" %></h3>
+      <h3><%= billing_type.presence || "Sin tipo de facturaci      n" %></h3>
 
       <table style="border-collapse: collapse; table-layout: fixed; word-break: break-word;">
         <thead>
@@ -65,7 +47,11 @@
                 <td style="width: 200px; border: 1px solid;"><%= link_to proj.name, project_path(proj) %></td>
                 <% [*1..12].each do |m| %>
                   <td style="width: 80px; text-align: center; border: 1px solid;">
-                    <%= link_to is_staff ? @total_hours[proj.id][m] : "Ver", controller: "proforma", project_id: proj.identifier, month: @year + "-" + m.to_s.rjust(2, "0") + "-01" if @project_hours[proj.id][m] %>
+                    <% if proj.module_enabled?(:proformanext) %>
+                      <%= link_to @total_hours[proj.id][m], controller: "proformanext", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rj>
+                    <% else %>
+                      <%= link_to @total_hours[proj.id][m], controller: "proforma", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(>
+                    <% end %>
                   </td>
                 <% end %>
               </tr>
@@ -76,4 +62,4 @@
       <br/>
     </div>
   <% end %>
-<% end %>
+<% end %>      
