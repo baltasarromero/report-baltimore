@@ -3,15 +3,13 @@ class ReportController < ApplicationController
   before_action :require_admin
   
   def index
-    projects = Project.all
+    projects = get_invoiceable_projects()
     @billing_types = fetch_billing_types(projects)
     @grouped_projects = group_projects_by_billing_type(projects)
     @year = params[:year] || Time.current.year.to_s
     @previous_year = (@year.to_i - 1).to_s
     @next_year = (@year.to_i + 1).to_s
-    @hide_project = CustomField.find_by(name: 'Ocultar en Facturacion')
-    @hidden = {}
-    @total_hours = calculate_total_hours(projects, @hidden)
+    @total_hours = calculate_total_hours(projects)
   end
 
   private
@@ -35,15 +33,12 @@ class ReportController < ApplicationController
     projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
   end
 
-  def calculate_total_hours(projects, hidden)
+  def calculate_total_hours(projects)
     total_hours = {}
     non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
   
     projects.each do |proj|
-      # Mark project as hidden if it should be hidden from invoicing
-      logger.info("project data #{p proj}") 
-      hidden[proj.id] = proj.custom_field_value(@hide_project.id).to_i.nonzero?
-
+      logger.info("Project id #{proj.id}, #{proj.name}")
       month_hours = {}
       (1..12).each do |month|
         monthly_hours = get_total_monthly_hours(proj.id, month, @year, non_billables_id)
@@ -64,5 +59,12 @@ class ReportController < ApplicationController
     time_entries = project_time_entries(project_id, month, year, non_billables_id)
 
     time_entries.sum(:hours).to_i
+  end
+
+  def get_invoiceable_projects()
+    # Get the id of the custom field needed
+    hide_project_id = CustomField.find_by(name: 'Ocultar en Facturacion')
+    # A value of 0 indicates that the project is NOT hidden for invoiving reports
+    Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_id} and cv.value = 0 order by projects.id");
   end
 end
