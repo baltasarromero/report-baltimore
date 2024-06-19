@@ -65,7 +65,7 @@ class ReportController < ApplicationController
         logger.info("looking for entries for #{proj.id} and #{month}")
         # Ensure that proj.id and month exist in the dictionary
         if time_entries_dict.key?(proj.id) && time_entries_dict[proj.id].key?(month)
-          logging.info("adding hours")
+          logger.info("adding hours")
           monthly_hours = time_entries_dict[proj.id][month]
         end
       end
