@@ -62,8 +62,10 @@ class ReportController < ApplicationController
       logger.info("Project id #{proj.id}, #{proj.name}")
       month_hours = {}
       (1..12).each do |month|
-        monthly_hours = time_entries_dict[proj.id][month]
-        month_hours[month] =  monthly_hours if monthly_hours > 0
+        # Ensure that proj.id and month exist in the dictionary
+        if time_entries_dict.key?(proj.id) && time_entries_dict[proj.id].key?(month)
+          monthly_hours = time_entries_dict[proj.id][month]
+        end
       end
       total_hours[proj.id] = month_hours  
     end
