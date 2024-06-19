@@ -43,7 +43,6 @@ class ReportController < ApplicationController
     non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
   
     projects.each do |proj|
-      logger.info("Project id #{proj.id}, #{proj.name}")
       month_hours = {}
       (1..12).each do |month|
         monthly_hours = get_total_monthly_hours(proj.id, month, @year, non_billables_id)
@@ -59,7 +58,6 @@ class ReportController < ApplicationController
     total_hours = {}
   
     projects.each do |proj|
-      logger.info("Project id #{proj.id}, #{proj.name}")
       month_hours = {}
       (1..12).each do |month|
         # Ensure that proj.id and month exist in the dictionary
@@ -89,6 +87,9 @@ class ReportController < ApplicationController
   def get_hours_by_project_month(year, non_billables_id)
     time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billables_id).group(:project_id, :tmonth).order(:project_id, :month)
     
+    logger.info("called query to retrieve time entries")
+    logger.info("this is the time entry #{time_entries}")
+
     time_entries.each do |entry|
       logger.info(puts "Project ID: #{entry.project_id}, Year: #{year}, Month: #{entry.month}, Total Monthly Hours: #{entry.total_monthly_hours}")
     end
