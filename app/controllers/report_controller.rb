@@ -13,11 +13,11 @@ class ReportController < ApplicationController
 
     time_entries_dict = get_hours_by_project_month(@year, non_billables_id)
     
-    new_total_hours = calculate_total_hours(projects, time_entries_dict)
+    old_total_hours = calculate_total_hours_old(projects)
 
-    logger.info("total hours new is #{new_total_hours}")
-    @total_hours = calculate_total_hours_old(projects)
-    logger.info("total hours old is #{@total_hours}")
+    logger.info("total hours old is #{new_total_hours}")
+    @total_hours = calculate_total_hours(projects, time_entries_dict)
+    logger.info("total hours new is #{@total_hours}")
 
   end
 
@@ -61,16 +61,13 @@ class ReportController < ApplicationController
   def calculate_total_hours(projects, time_entries_dict)
     total_hours = {}
 
-    logger.info("these are the received dictionaries #{time_entries_dict}")
-  
     projects.each do |proj|
       month_hours = {}
       (1..12).each do |month|
         logger.info("looking for entries for #{proj.id} and #{month}")
         # Ensure that proj.id and month exist in the dictionary
         if time_entries_dict.key?(proj.id) && time_entries_dict[proj.id].key?(month)
-          logger.info("adding hours")
-          monthly_hours = time_entries_dict[proj.id][month]
+          month_hours[month] = time_entries_dict[proj.id][month]
         end
       end
       total_hours[proj.id] = month_hours  
