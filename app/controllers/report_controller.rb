@@ -13,10 +13,6 @@ class ReportController < ApplicationController
 
     time_entries_dict = get_hours_by_project_month(@year, non_billables_id)
     
-    time_entries.each do |entry|
-      logger.info(puts "Project ID: #{entry.project_id}, Year: #{@year}, Month: #{entry.month}, Total Monthly Hours: #{entry.total_monthly_hours}")
-    end
-    
     @total_hours = calculate_total_hours(projects, time_entries_dict)
 
   end
