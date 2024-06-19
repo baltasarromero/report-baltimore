@@ -15,7 +15,7 @@ class ReportController < ApplicationController
     
     old_total_hours = calculate_total_hours_old(projects)
 
-    logger.info("total hours old is #{new_total_hours}")
+    logger.info("total hours old is #{old_total_hours}")
     @total_hours = calculate_total_hours(projects, time_entries_dict)
     logger.info("total hours new is #{@total_hours}")
 
