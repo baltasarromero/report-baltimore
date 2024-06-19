@@ -2,7 +2,7 @@
   <%= javascript_include_tag "report.js", :plugin => "report" %>
 <% end %>
 
-<% html_title "Facturaci      n " + @yer.to_s %>
+<% html_title "Facturación" + @yer.to_s %>
 
 <%= link_to ("<button style='vertical-align: middle;'><</button>").html_safe, controller: "report", year: @previous_year %>
 <h2 style="display: inline; padding: 2px 5px 2px 5px; vertical-align: middle;"><%= @year.to_s %></h2>
@@ -20,7 +20,7 @@
     <% billing_type_id = (billing_type.presence || "Sin tipo de facturación").gsub(/[^a-zA-Z0-9]/, '').downcase %>
 
       <div id="<%= billing_type_id %>">
-      <h3><%= billing_type.presence || "Sin tipo de facturaci      n" %></h3>
+      <h3><%= billing_type.presence || "Sin tipo de facturación" %></h3>
 
       <table style="border-collapse: collapse; table-layout: fixed; word-break: break-word;">
         <thead>
@@ -46,11 +46,13 @@
               <td style="width: 200px; border: 1px solid;"><%= link_to proj.name, project_path(proj) %></td>
               <% [*1..12].each do |m| %>
                 <td style="width: 80px; text-align: center; border: 1px solid;">
-                  <% if proj.module_enabled?(:proformanext) %>
-                    <%= link_to @total_hours[proj.id][m], controller: "proformanext", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
-                  <% else %>
-                    <%= link_to @total_hours[proj.id][m], controller: "proforma", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
-                  <% end %>
+                  <% if @total_hours.key?(proj.id) && @total_hours[proj.id].key?(m) %>
+                    <% if proj.module_enabled?(:proformanext) %>
+                      <%= link_to @total_hours[proj.id][m], controller: "proformanext", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
+                    <% else %>
+                      <%= link_to @total_hours[proj.id][m], controller: "proforma", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
+                    <% end %>
+                  <% end %>  
                 </td>
               <% end %>  
             </tr>

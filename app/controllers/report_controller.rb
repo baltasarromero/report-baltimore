@@ -9,10 +9,10 @@ class ReportController < ApplicationController
     @year = params[:year] || Time.current.year.to_s
     @previous_year = (@year.to_i - 1).to_s
     @next_year = (@year.to_i + 1).to_s
-    non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
+    non_billable_entry_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
 
 
-    @total_hours  = get_hours_by_project_month(@year, non_billables_id, projects.map(&:id))
+    @total_hours  = get_hours_by_project_month(@year, non_billable_entry_id, projects.map(&:id))
   
     #@total_hours = calculate_total_hours(projects, time_entries_dict)
   
@@ -69,9 +69,9 @@ class ReportController < ApplicationController
     time_entries.sum(:hours).to_i
   end
 
-  def get_hours_by_project_month(year, non_billables_id, billable_projects_ids)
+  def get_hours_by_project_month(year, non_billable_entry_id, billable_projects_ids)
     logger.info("billable project ids #{billable_projects_ids}")
-    time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billables_id).where(project_id: billable_projects_ids).group(:project_id, :tmonth).order(:project_id, :tmonth)
+    time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billable_entry_id).where(project_id: billable_projects_ids).group(:project_id, :tmonth).order(:project_id, :tmonth)
     
     # Convert to a dictionary of dictionaries
     time_entries_dict = time_entries.each_with_object({}) do |entry, hash|
