@@ -91,7 +91,7 @@ class ReportController < ApplicationController
     logger.info("there are #{time_entries.size} records loaded. this is the time entry #{time_entries}")
 
     time_entries.each do |entry|
-      logger.info(puts "Project ID: #{entry.project_id}, Year: #{year}, Month: #{entry.month}, Total Monthly Hours: #{entry.total_monthly_hours}")
+      logger.info("Project ID: #{entry.project_id}, Year: #{year}, Month: #{entry.month}, Total Monthly Hours: #{entry.total_monthly_hours}")
     end
 
     # Convert to a dictionary of dictionaries
