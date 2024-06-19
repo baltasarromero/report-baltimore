@@ -88,7 +88,7 @@ class ReportController < ApplicationController
     time_entries.sum(:hours).to_i
   end
 
-  def get_hours_by_project_month(year, non_billables_id, )
+  def get_hours_by_project_month(year, non_billables_id)
     time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billables_id).group(:project_id, :tmonth).order(:project_id, :month)
   
     # Convert to a dictionary of dictionaries
