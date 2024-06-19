@@ -12,9 +12,9 @@ class ReportController < ApplicationController
     non_billables_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
 
 
-    time_entries_dict = get_hours_by_project_month(@year, non_billables_id, projects.map(&:id))
+    @total_hours  = get_hours_by_project_month(@year, non_billables_id, projects.map(&:id))
   
-    @total_hours = calculate_total_hours(projects, time_entries_dict)
+    #@total_hours = calculate_total_hours(projects, time_entries_dict)
   
   end
 
