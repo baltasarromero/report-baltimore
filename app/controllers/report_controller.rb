@@ -90,7 +90,7 @@ class ReportController < ApplicationController
     time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billables_id).group(:project_id, :tmonth).order(:project_id, :month)
     
     time_entries.each do |entry|
-      puts "Project ID: #{entry.project_id}, Year: #{year}, Month: #{entry.month}, Total Monthly Hours: #{entry.total_monthly_hours}"
+      logger.info(puts "Project ID: #{entry.project_id}, Year: #{year}, Month: #{entry.month}, Total Monthly Hours: #{entry.total_monthly_hours}")
     end
 
     # Convert to a dictionary of dictionaries
