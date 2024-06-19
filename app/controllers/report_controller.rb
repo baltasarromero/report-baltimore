@@ -13,7 +13,11 @@ class ReportController < ApplicationController
 
     time_entries_dict = get_hours_by_project_month(@year, non_billables_id)
     
-    @total_hours = calculate_total_hours(projects, time_entries_dict)
+    new_total_hours = calculate_total_hours(projects, time_entries_dict)
+
+    logger.info("total hours new is #{new_total_hours}")
+    @total_hours = calculate_total_hours_old(projects)
+    logger.info("total hours old is #{@total_hours}")
 
   end
 
