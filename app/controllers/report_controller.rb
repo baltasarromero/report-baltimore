@@ -87,8 +87,8 @@ class ReportController < ApplicationController
   def get_hours_by_project_month(year, non_billables_id)
     time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billables_id).group(:project_id, :tmonth).order(:project_id, :month)
     
-    logger.info("called query to retrieve time entries")
-    logger.info("this is the time entry #{time_entries}")
+    logger.info("called query to retrieve time entries ")
+    logger.info("there are #{time_entries.size} records loaded. this is the time entry #{time_entries}")
 
     time_entries.each do |entry|
       logger.info(puts "Project ID: #{entry.project_id}, Year: #{year}, Month: #{entry.month}, Total Monthly Hours: #{entry.total_monthly_hours}")
