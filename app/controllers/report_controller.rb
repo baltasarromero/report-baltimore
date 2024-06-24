@@ -83,9 +83,14 @@ class ReportController < ApplicationController
   end  
 
   def get_invoiceable_projects()
-    # Get the id of the custom field needed
-    hide_project_custom_field = CustomField.find_by(name: 'Ocultar en Facturacion')
-    # A value of 0 indicates that the project is NOT hidden for invoiving reports
-    Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_custom_field.id} and cv.value = 0");
-  end
+    projects = []
+    elapsed_time = Benchmark.realtime do
+      # Get the id of the custom field needed
+      hide_project_custom_field = CustomField.find_by(name: 'Ocultar en Facturacion')
+      # A value of 0 indicates that the project is NOT hidden for invoiving reports
+      projects = Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_custom_field.id} and cv.value = 0");
+    end
+    logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
+    projects
+  end  
 end
