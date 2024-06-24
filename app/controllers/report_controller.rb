@@ -37,8 +37,8 @@ class ReportController < ApplicationController
     
     # Convert to a dictionary of dictionaries
     projects_by_billing_type = projects.each_with_object({}) do |project, hash|
-      hash[entry.billing_type] ||= [] # Initialize an empty array if not already present
-      hash[entry.billing_type] << { id: id, name: name, identifier: identifier }
+      hash[project.billing_type] ||= [] # Initialize an empty array if not already present
+      hash[project.billing_type] << { id: project.id, name: project.name, identifier: project.identifier }
     end
 
     projects_by_billing_type
