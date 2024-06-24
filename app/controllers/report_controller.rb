@@ -33,6 +33,8 @@ class ReportController < ApplicationController
   end
 
   def group_projects_by_billing_type(projects)
+    projects_by_billing_type = {}
+    
     elapsed_time = Benchmark.realtime do
       projects_by_billing_type = projects.each_with_object({}) do |project, hash|
         hash[project.billing_type] ||= []
