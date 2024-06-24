@@ -41,16 +41,16 @@
           </tr>
         </thead>
         <tbody>
-          <% projects.sort_by { |p| p.name }.each do |proj| %>
+          <% projects.sort_by { |p| p[name] }.each do |proj| %>
             <tr>
-              <td style="width: 200px; border: 1px solid;"><%= link_to proj.name, project_path(proj) %></td>
+              <td style="width: 200px; border: 1px solid;"><%= link_to proj[name], project_path(proj) %></td>
               <% [*1..12].each do |m| %>
                 <td style="width: 80px; text-align: center; border: 1px solid;">
-                  <% if @total_hours.key?(proj.id) && @total_hours[proj.id].key?(m) %>
+                  <% if @total_hours.key?(proj[id]) && @total_hours[proj[id]].key?(m) %>
                     <% if proj.module_enabled?(:proformanext) %>
-                      <%= link_to @total_hours[proj.id][m], controller: "proformanext", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
+                      <%= link_to @total_hours[proj[id]][m], controller: "proformanext", project_id: proj[identifier], month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj[id]][m] %>
                     <% else %>
-                      <%= link_to @total_hours[proj.id][m], controller: "proforma", project_id: proj.identifier, month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj.id][m] %>
+                      <%= link_to @total_hours[proj[id]][m], controller: "proforma", project_id: proj[identifier], month: @year.to_s + "-" + m.to_s.rjust(2, "0") + "-01" if @total_hours[proj[id]][m] %>
                     <% end %>
                   <% end %>  
                 </td>
