@@ -40,14 +40,10 @@ class ReportController < ApplicationController
   end
 
   def group_projects_by_billing_type(projects)
-    elapsed_time = Benchmark.realtime do
-      billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
-      return {} unless billing_type
+    billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
+    return {} unless billing_type
     
-      projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
-    end 
-    logger.info("Elapsed time grouping projects: #{elapsed_time} seconds") 
-    projects
+    projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
   end
 
   def get_hours_by_project_month(year, non_billable_entry_id, billable_projects_ids)
