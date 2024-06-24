@@ -40,7 +40,7 @@ class ReportController < ApplicationController
       hash[project.billing_type] ||= [] # Initialize an empty array if not already present
       hash[project.billing_type] << { id: project.id, name: project.name, identifier: project.identifier }
     end
-
+    logger.info("these are the projects by billing type: #{projects_by_billing_type}")
     projects_by_billing_type
   end
 
