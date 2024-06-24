@@ -33,29 +33,18 @@ class ReportController < ApplicationController
   end
 
   def group_projects_by_billing_type(projects)
-    projects_by_billing_type = {}
     elapsed_time = Benchmark.realtime do
-      # Convert to a dictionary of dictionaries
       projects_by_billing_type = projects.each_with_object({}) do |project, hash|
-        hash[project.billing_type] ||= [] # Initialize an empty array if not already present
-        hash[project.billing_type] << project
+        hash[project.billing_type] ||= []
+        insertion_index = hash[project.billing_type].bsearch_index { |p| p.name > project.name } || hash[project.billing_type].size
+        hash[project.billing_type].insert(insertion_index, project)
       end
-
-      projects_by_billing_type.keys.each do |key|
-        projects_by_billing_type[key] = projects_by_billing_type[key].sort_by(&:name)
-      end
+      logger.info("Elapsed time grouping and ordering projects: #{elapsed_time} seconds")
+      projects_by_billing_type
     end
-
-    logger.info("Elapsed time grouping and ordering projects: #{elapsed_time} seconds")  
-    projects_by_billing_type
   end
-
-  def group_projects_by_billing_type_old(projects)
-    billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
-    return {} unless billing_type
   
-    projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
-  end
+
 
   def get_hours_by_project_month(year, non_billable_entry_id, billable_projects_ids)
     time_entries_dict = {}
