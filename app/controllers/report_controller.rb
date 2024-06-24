@@ -40,7 +40,13 @@ class ReportController < ApplicationController
       hash[project.billing_type] ||= [] # Initialize an empty array if not already present
       hash[project.billing_type] << project
     end
-    logger.info("these are the projects by billing type: #{projects_by_billing_type}")
+
+    projects_by_billing_type.keys.each do |key|
+      projects_by_billing_type[key] = projects_by_billing_type[key].sort_by(&:name)
+    end
+    
+
+    logger.info("these are the sorted projects by billing type: #{projects_by_billing_type}")
     projects_by_billing_type
   end
 
