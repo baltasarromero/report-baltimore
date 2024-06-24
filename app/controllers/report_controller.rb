@@ -33,17 +33,17 @@ class ReportController < ApplicationController
   end
 
   def group_projects_by_billing_type(projects)
-    projects_by_billing_type = {}
-    
     elapsed_time = Benchmark.realtime do
       projects_by_billing_type = projects.each_with_object({}) do |project, hash|
         hash[project.billing_type] ||= []
         insertion_index = hash[project.billing_type].bsearch_index { |p| p.name > project.name } || hash[project.billing_type].size
         hash[project.billing_type].insert(insertion_index, project)
       end
-      logger.info("Elapsed time grouping and ordering projects: #{elapsed_time} seconds")
-      projects_by_billing_type
     end
+    logger.info("Elapsed time grouping and ordering projects: #{elapsed_time} seconds")
+    logger.info("these are the grouped and sorted projects: #{projects_by_billing_type} seconds")
+
+    projects_by_billing_type
   end
   
 
