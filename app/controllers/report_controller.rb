@@ -10,7 +10,7 @@ class ReportController < ApplicationController
     @year = params[:year] || Time.current.year.to_s
     @previous_year = (@year.to_i - 1).to_s
     @next_year = (@year.to_i + 1).to_s
-    @total_hours = {}∫
+    @total_hours = {}
 
     elapsed_time = Benchmark.realtime do
       projects = get_invoiceable_projects()
