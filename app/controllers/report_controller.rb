@@ -86,8 +86,7 @@ class ReportController < ApplicationController
       .joins("LEFT JOIN enabled_modules em ON em.project_id = projects.id AND em.name = 'proformanext'")
       .select("projects.id, projects.name, projects.identifier, cvbt.value AS billing_type, 
           CASE WHEN em.id IS NOT NULL THEN TRUE ELSE FALSE END AS proformanext_enabled")
-
-      .order("billing_type ASC")
+          .order("billing_type ASC")
     end
     logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
     
