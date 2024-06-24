@@ -45,6 +45,7 @@ class ReportController < ApplicationController
   end
 
   def get_hours_by_project_month(year, non_billable_entry_id, billable_projects_ids)
+    time_entries_dict = {}
     elapsed_time = Benchmark.realtime do
       time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billable_entry_id).where(project_id: billable_projects_ids).group(:project_id, :tmonth).order(:project_id, :tmonth)
       
