@@ -41,7 +41,7 @@
           </tr>
         </thead>
         <tbody>
-          <% projects.sort_by { |p| p.name }.each do |proj| %>
+          <% projects.each do |proj| %>
             <tr>
               <td style="width: 200px; border: 1px solid;"><%= link_to proj.name, project_path(proj) %></td>
               <% [*1..12].each do |m| %>

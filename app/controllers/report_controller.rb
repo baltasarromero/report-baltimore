@@ -34,19 +34,19 @@ class ReportController < ApplicationController
 
   def group_projects_by_billing_type(projects)
     projects_by_billing_type = {}
-    
-    # Convert to a dictionary of dictionaries
-    projects_by_billing_type = projects.each_with_object({}) do |project, hash|
-      hash[project.billing_type] ||= [] # Initialize an empty array if not already present
-      hash[project.billing_type] << project
+    elapsed_time = Benchmark.realtime do
+      # Convert to a dictionary of dictionaries
+      projects_by_billing_type = projects.each_with_object({}) do |project, hash|
+        hash[project.billing_type] ||= [] # Initialize an empty array if not already present
+        hash[project.billing_type] << project
+      end
+
+      projects_by_billing_type.keys.each do |key|
+        projects_by_billing_type[key] = projects_by_billing_type[key].sort_by(&:name)
+      end
     end
 
-    projects_by_billing_type.keys.each do |key|
-      projects_by_billing_type[key] = projects_by_billing_type[key].sort_by(&:name)
-    end
-    
-
-    logger.info("these are the sorted projects by billing type: #{projects_by_billing_type}")
+    logger.info("Elapsed time grouping and ordering projects: #{elapsed_time} seconds")  
     projects_by_billing_type
   end
 
