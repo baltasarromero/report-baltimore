@@ -70,15 +70,17 @@ class ReportController < ApplicationController
   end
 
   def get_hours_by_project_month(year, non_billable_entry_id, billable_projects_ids)
-    logger.info("billable project ids #{billable_projects_ids}")
-    time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billable_entry_id).where(project_id: billable_projects_ids).group(:project_id, :tmonth).order(:project_id, :tmonth)
-    
-    # Convert to a dictionary of dictionaries
-    time_entries_dict = time_entries.each_with_object({}) do |entry, hash|
-      hash[entry.project_id] ||= {}
-      hash[entry.project_id][entry.month] = entry.total_monthly_hours
-    end
-
+    time_entries_dict = {}
+    elapsed_time = Benchmark.realtime do
+      time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billable_entry_id).where(project_id: billable_projects_ids).group(:project_id, :tmonth).order(:project_id, :tmonth)
+      
+      # Convert to a dictionary of dictionaries
+      time_entries_dict = time_entries.each_with_object({}) do |entry, hash|
+        hash[entry.project_id] ||= {}
+        hash[entry.project_id][entry.month] = entry.total_monthly_hours
+      end
+    end  
+    logger.info("Elapsed time getting time entries: #{elapsed_time} seconds") 
     time_entries_dict
   end  
 
