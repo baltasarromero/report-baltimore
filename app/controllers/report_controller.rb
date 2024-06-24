@@ -83,7 +83,10 @@ class ReportController < ApplicationController
       projects = Project
       .joins("INNER JOIN custom_values cvof ON cvof.customized_id = projects.id AND cvof.customized_type = 'Project' AND cvof.custom_field_id = #{hide_project_custom_field.id} AND cvof.value = 0")
       .joins("INNER JOIN custom_values cvbt ON cvbt.customized_id = projects.id AND cvbt.customized_type = 'Project' AND cvbt.custom_field_id = #{billing_type.id}")
-      .select("projects.id, projects.name, projects.identifier, cvbt.value AS billing_type")
+      .joins("LEFT JOIN enabled_modules em ON em.project_id = projects.id AND em.name = 'proformanext'")
+      .select("projects.id, projects.name, projects.identifier, cvbt.value AS billing_type, 
+          CASE WHEN em.id IS NOT NULL THEN TRUE ELSE FALSE END AS proformanext_enabled")
+
       .order("billing_type ASC")
     end
     logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
