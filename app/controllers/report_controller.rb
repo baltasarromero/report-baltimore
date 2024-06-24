@@ -38,7 +38,7 @@ class ReportController < ApplicationController
     # Convert to a dictionary of dictionaries
     projects_by_billing_type = projects.each_with_object({}) do |project, hash|
       hash[project.billing_type] ||= [] # Initialize an empty array if not already present
-      hash[project.billing_type] << { id: project.id, name: project.name, identifier: project.identifier }
+      hash[project.billing_type] << project
     end
     logger.info("these are the projects by billing type: #{projects_by_billing_type}")
     projects_by_billing_type
@@ -82,12 +82,7 @@ class ReportController < ApplicationController
     end
     logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
     
-    logger.info("projects results before rendering: #{projects} ") 
-    
-    rendered_projects = render json: projects
-
-    logger.info("projects results after rendering #{rendered_projects}")
-
-    rendered_projects
+    #rendered_projects = render json: projects
+    projects
   end  
 end
