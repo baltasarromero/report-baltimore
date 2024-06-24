@@ -5,13 +5,18 @@ class ReportController < ApplicationController
   before_action :require_admin
   
   def index
+    @billing_types = []
+    @grouped_projects = []
+    @year = params[:year] || Time.current.year.to_s
+    @previous_year = (@year.to_i - 1).to_s
+    @next_year = (@year.to_i + 1).to_s
+    @total_hours = {}∫
+
     elapsed_time = Benchmark.realtime do
       projects = get_invoiceable_projects()
       @billing_types = fetch_billing_types(projects)
       @grouped_projects = group_projects_by_billing_type(projects)
-      @year = params[:year] || Time.current.year.to_s
-      @previous_year = (@year.to_i - 1).to_s
-      @next_year = (@year.to_i + 1).to_s
+     
       non_billable_entry_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
 
       @total_hours  = get_hours_by_project_month(@year, non_billable_entry_id, projects.map(&:id))
