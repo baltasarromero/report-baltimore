@@ -1,5 +1,3 @@
-require 'benchmark'
-
 class ReportController < ApplicationController
   unloadable
   before_action :require_admin
@@ -12,7 +10,12 @@ class ReportController < ApplicationController
     @previous_year = (@year.to_i - 1).to_s
     @next_year = (@year.to_i + 1).to_s
     non_billable_entry_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
+
+
     @total_hours  = get_hours_by_project_month(@year, non_billable_entry_id, projects.map(&:id))
+  
+    #@total_hours = calculate_total_hours(projects, time_entries_dict)
+  
   end
 
   private
@@ -30,39 +33,59 @@ class ReportController < ApplicationController
   end
 
   def group_projects_by_billing_type(projects)
-    elapsed_time = Benchmark.realtime do
-      billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
-      return {} unless billing_type
-    
-      projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
-    end 
-    logger.info("Elapsed time grouping projects: #{elapsed_time} seconds") 
+    billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
+    return {} unless billing_type
+  
+    projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
+  end
+
+  def calculate_total_hours(projects, time_entries_dict)
+    total_hours = {}
+
+    projects.each do |proj|
+      month_hours = {}
+      (1..12).each do |month|
+        # Ensure that proj.id and month exist in the dictionary
+        if time_entries_dict.key?(proj.id) && time_entries_dict[proj.id].key?(month)
+          month_hours[month] = time_entries_dict[proj.id][month]
+        end
+      end
+      total_hours[proj.id] = month_hours  
+    end
+  
+    total_hours
+  end
+
+
+
+  def project_time_entries(project_id, month, year, non_billables_id)
+    time_entries = TimeEntry.where("tmonth = ? and tyear = ? and project_id = ?",
+                                   month, year, project_id).where.not("activity_id = ?", non_billables_id)
+  end
+
+  def get_total_monthly_hours(project_id, month, year, non_billables_id)
+    time_entries = project_time_entries(project_id, month, year, non_billables_id)
+
+    time_entries.sum(:hours).to_i
   end
 
   def get_hours_by_project_month(year, non_billable_entry_id, billable_projects_ids)
-    time_entries_dict = {}
-    elapsed_time = Benchmark.realtime do
-      time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billable_entry_id).where(project_id: billable_projects_ids).group(:project_id, :tmonth).order(:project_id, :tmonth)
-      
-      # Convert to a dictionary of dictionaries
-      time_entries_dict = time_entries.each_with_object({}) do |entry, hash|
-        hash[entry.project_id] ||= {}
-        hash[entry.project_id][entry.month] = entry.total_monthly_hours
-      end
-    end  
-    logger.info("Elapsed time getting time entries: #{elapsed_time} seconds") 
+    logger.info("billable project ids #{billable_projects_ids}")
+    time_entries = TimeEntry.select('project_id, tmonth AS month, SUM(hours) AS total_monthly_hours').where(tyear: year).where.not(activity_id: non_billable_entry_id).where(project_id: billable_projects_ids).group(:project_id, :tmonth).order(:project_id, :tmonth)
+    
+    # Convert to a dictionary of dictionaries
+    time_entries_dict = time_entries.each_with_object({}) do |entry, hash|
+      hash[entry.project_id] ||= {}
+      hash[entry.project_id][entry.month] = entry.total_monthly_hours
+    end
+
     time_entries_dict
   end  
 
   def get_invoiceable_projects()
-    projects = []
-    elapsed_time = Benchmark.realtime do
-      # Get the id of the custom field needed
-      hide_project_custom_field = CustomField.find_by(name: 'Ocultar en Facturacion')
-      # A value of 0 indicates that the project is NOT hidden for invoiving reports
-      projects = Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_custom_field.id} and cv.value = 0");
-    end
-    logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
-    projects
-  end  
+    # Get the id of the custom field needed
+    hide_project_custom_field = CustomField.find_by(name: 'Ocultar en Facturacion')
+    # A value of 0 indicates that the project is NOT hidden for invoiving reports
+    Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_custom_field.id} and cv.value = 0");
+  end
 end
