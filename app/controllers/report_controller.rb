@@ -82,6 +82,12 @@ class ReportController < ApplicationController
     end
     logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
     
-    render json: @projects
+    logger.info("projects results before rendering: #{projects} ") 
+    
+    rendered_projects = render json: projects
+
+    logger.info("projects results after rendering #{rendered_projects}")
+
+    rendered_projects
   end  
 end
