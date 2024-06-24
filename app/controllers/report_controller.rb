@@ -33,16 +33,21 @@ class ReportController < ApplicationController
   end
 
   def group_projects_by_billing_type(projects)
+    projects_by_billing_type = {}
+    
+    # Convert to a dictionary of dictionaries
+    projects_by_billing_type = projects.each_with_object({}) do |project, hash|
+      hash[entry.billing_type] ||= [] # Initialize an empty array if not already present
+      hash[entry.billing_type] << { id: id, name: name, identifier: identifier }
+    end
+
+    projects_by_billing_type
+  end
+
+  def group_projects_by_billing_type_old(projects)
     billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
     return {} unless billing_type
   
-    projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
-  end
-
-  def group_projects_by_billing_type(projects)
-    billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
-    return {} unless billing_type
-    
     projects.group_by { |proj| proj.custom_field_value(billing_type.id) }
   end
 
@@ -66,8 +71,14 @@ class ReportController < ApplicationController
     elapsed_time = Benchmark.realtime do
       # Get the id of the custom field needed
       hide_project_custom_field = CustomField.find_by(name: 'Ocultar en Facturacion')
-      # A value of 0 indicates that the project is NOT hidden for invoiving reports
-      projects = Project.joins('INNER JOIN custom_values cv ON cv.customized_id = projects.id').where("cv.custom_field_id = #{hide_project_custom_field.id} and cv.value = 0");
+      # Get the id of the custom field needed
+      billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
+      # A value of 0 for the custom field indicates that the project is NOT hidden for invoiving reports   
+      projects = Project
+      .joins("INNER JOIN custom_values cvof ON cvof.customized_id = projects.id AND ccvof.customized_type = 'Project' AND cvof.custom_field_id = #{hide_project_custom_field.id} AND cvof.value = 0")
+      .joins("INNER JOIN custom_values cvbt ON cvbt.customized_id = projects.id AND cvbt.customized_type = 'Project' AND cvbt.custom_field_id = #{billing_type.id}")
+      .select("projects.id, projects.name, projects.identifier, cvbt.value AS billing_type")
+      .order("billing_type ASC")
     end
     logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
     projects
