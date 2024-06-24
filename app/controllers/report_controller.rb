@@ -11,24 +11,24 @@ class ReportController < ApplicationController
     @next_year = (@year.to_i + 1).to_s
     non_billable_entry_id = TimeEntryActivity.find_by(name: 'No-Facturables')&.id
 
-
     @total_hours  = get_hours_by_project_month(@year, non_billable_entry_id, projects.map(&:id))
-  
-    #@total_hours = calculate_total_hours(projects, time_entries_dict)
-  
   end
 
   private
 
   def fetch_billing_types(projects)
-    billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
-    return [] unless billing_type
-  
-    billing_types = projects.first.available_custom_fields
-                               .select { |cf| cf.name == billing_type.name }
-                               .first&.possible_values || []
-  
-    billing_types.push("") unless billing_types.include?("")
+    billing_types = []
+    elapsed_time = Benchmark.realtime do
+      billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
+      return [] unless billing_type
+    
+      billing_types = projects.first.available_custom_fields
+                                .select { |cf| cf.name == billing_type.name }
+                                .first&.possible_values || []
+    
+      billing_types.push("") unless billing_types.include?("")
+    end
+    logger.info("Elapsed time getting billing types: #{elapsed_time} seconds")   
     billing_types
   end
 
