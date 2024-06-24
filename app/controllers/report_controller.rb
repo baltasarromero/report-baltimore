@@ -75,7 +75,7 @@ class ReportController < ApplicationController
       billing_type = CustomField.find_by(name: 'Tipo de Facturacion')
       # A value of 0 for the custom field indicates that the project is NOT hidden for invoiving reports   
       projects = Project
-      .joins("INNER JOIN custom_values cvof ON cvof.customized_id = projects.id AND ccvof.customized_type = 'Project' AND cvof.custom_field_id = #{hide_project_custom_field.id} AND cvof.value = 0")
+      .joins("INNER JOIN custom_values cvof ON cvof.customized_id = projects.id AND cvof.customized_type = 'Project' AND cvof.custom_field_id = #{hide_project_custom_field.id} AND cvof.value = 0")
       .joins("INNER JOIN custom_values cvbt ON cvbt.customized_id = projects.id AND cvbt.customized_type = 'Project' AND cvbt.custom_field_id = #{billing_type.id}")
       .select("projects.id, projects.name, projects.identifier, cvbt.value AS billing_type")
       .order("billing_type ASC")
