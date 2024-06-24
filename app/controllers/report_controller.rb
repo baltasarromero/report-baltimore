@@ -81,6 +81,7 @@ class ReportController < ApplicationController
       .order("billing_type ASC")
     end
     logger.info("Elapsed time getting invoiceable projects: #{elapsed_time} seconds") 
-    projects
+    
+    render json: @projects
   end  
 end
